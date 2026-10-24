@@ -162,4 +162,14 @@ class Doc:
         return tb
 
     def save(self, path):
+        # 新しく足した文字も同じフォントになるよう、テーマのフォントを変える
+        import re
+        master = self.prs.slide_masters[0]
+        for rel in master.part.rels.values():
+            if rel.reltype.endswith("/theme"):
+                part = rel.target_part
+                xml = part.blob.decode("utf-8")
+                xml = re.sub(r'<a:latin typeface="[^"]*"', f'<a:latin typeface="{FONT}"', xml)
+                xml = re.sub(r'<a:ea typeface="[^"]*"', f'<a:ea typeface="{FONT}"', xml)
+                part._blob = xml.encode("utf-8")
         self.prs.save(path)

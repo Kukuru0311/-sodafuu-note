@@ -1,0 +1,4 @@
+Zen Maru Gothic（Google Fonts）
+SIL Open Font License 1.1 の無料フォントです。ライセンスは OFL.txt を見てください。
+パソコンでは、ttfファイルを開いて「インストール」を選ぶと使えます。
+出典：https://fonts.google.com/specimen/Zen+Maru+Gothic

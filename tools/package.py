@@ -11,7 +11,7 @@ import zipfile
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 P = os.path.join(ROOT, "product", "01_taikenkai-kit")
 SRC = os.path.join(P, "src")
-KIT = "SodaFuu_体験会おしらせキット_v0.1"
+KIT = "SodaFuu_体験会のおしらせキット_v0.1"
 SALE = os.path.join(P, "販売ファイル", KIT)
 SAMPLE = os.path.join(P, "見本画像")
 NOTE_IMG = os.path.join(ROOT, "note", "01_taikenkai-kit")
@@ -33,7 +33,7 @@ def main():
     s = lambda n: os.path.join(SRC, n)
     render((s("instagram_soda.pptx"), TMP, "1080"), (s("instagram_mikan.pptx"), TMP, "1080"),
            (s("a4_flyer.pptx"), TMP, "1240"), (s("guide.pptx"), TMP, "-"),
-           (s("note_header.pptx"), TMP, "1280"))
+           (s("note_header.pptx"), TMP, "1280"), (s("checklist_sample.pptx"), TMP, "-"))
     t = lambda n: os.path.join(TMP, n)
     # PDF→PNGの丸めで1px大きくなるので、Instagram用はちょうど1080×1350にそろえる
     from PIL import Image
@@ -48,6 +48,18 @@ def main():
     shutil.copy(s("instagram_mikan.pptx"), os.path.join(SALE, "02_Instagram用_みかん色_1080x1350.pptx"))
     shutil.copy(s("a4_flyer.pptx"), os.path.join(SALE, "03_A4チラシ_2色.pptx"))
     shutil.copy(t("guide.pdf"), os.path.join(SALE, "00_はじめにお読みください_使い方ガイド.pdf"))
+    fonts = os.path.join(SALE, "フォント_ZenMaruGothic")
+    os.makedirs(fonts)
+    fdir = os.path.expanduser("~/.fonts")
+    for f in ("ZenMaruGothic-Regular.ttf", "ZenMaruGothic-Bold.ttf"):
+        shutil.copy(os.path.join(fdir, f), os.path.join(fonts, f))
+    shutil.copy(os.path.join(ROOT, "product", "01_taikenkai-kit", "fonts_OFL.txt"),
+                os.path.join(fonts, "OFL.txt"))
+    with open(os.path.join(fonts, "はじめにお読みください.txt"), "w", encoding="utf-8") as fp:
+        fp.write("Zen Maru Gothic（Google Fonts）\n"
+                 "SIL Open Font License 1.1 の無料フォントです。ライセンスは OFL.txt を見てください。\n"
+                 "パソコンでは、ttfファイルを開いて「インストール」を選ぶと使えます。\n"
+                 "出典：https://fonts.google.com/specimen/Zen+Maru+Gothic\n")
     mihon = os.path.join(SALE, "見本")
     os.makedirs(mihon)
     shutil.copy(t("instagram_soda-1.png"), os.path.join(mihon, "見本_Instagram_ソーダ色_1枚目.png"))
@@ -74,18 +86,16 @@ def main():
         os.path.join(NOTE_IMG, "見出し画像_1280x670.png"))
     for src, dst in [("instagram_soda-1.png", "記事用サンプル1_Instagram表紙.jpg"),
                      ("instagram_soda-2.png", "記事用サンプル2_Instagramくわしい内容.jpg"),
+                     ("instagram_mikan-1.png", "記事用サンプル6_Instagram表紙_みかん色.jpg"),
                      ("a4_flyer-1.png", "記事用サンプル3_A4チラシ_ソーダ色.jpg"),
                      ("a4_flyer-2.png", "記事用サンプル4_A4チラシ_みかん色.jpg"),
-                     ("guide-3.png", "記事用サンプル5_告知チェックリスト.jpg")]:
+                     ("guide-4.png", "記事用サンプル5_告知チェックリスト.jpg")]:
         im = Image.open(t(src)).convert("RGB")
         if im.width > 1240:
             im = im.resize((1240, round(im.height * 1240 / im.width)))
         im.save(os.path.join(NOTE_IMG, dst), quality=88)
     # 無料サンプル：チェックリストのページだけのPDF
-    from pypdf import PdfReader, PdfWriter
-    w = PdfWriter()
-    w.add_page(PdfReader(t("guide.pdf")).pages[2])
-    w.write(os.path.join(NOTE_IMG, "無料サンプル_告知チェックリスト.pdf"))
+    shutil.copy(t("checklist_sample.pdf"), os.path.join(NOTE_IMG, "無料サンプル_告知チェックリスト.pdf"))
 
     shutil.rmtree(TMP)
     print("ok", zpath, os.path.getsize(zpath))
