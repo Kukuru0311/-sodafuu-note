@@ -35,6 +35,13 @@ def main():
            (s("a4_flyer.pptx"), TMP, "1240"), (s("guide.pptx"), TMP, "-"),
            (s("note_header.pptx"), TMP, "1280"))
     t = lambda n: os.path.join(TMP, n)
+    # PDF→PNGの丸めで1px大きくなるので、Instagram用はちょうど1080×1350にそろえる
+    from PIL import Image
+    for f in os.listdir(TMP):
+        if f.startswith("instagram_") and f.endswith(".png"):
+            im = Image.open(t(f))
+            if im.size != (1080, 1350):
+                im.resize((1080, 1350), Image.LANCZOS).save(t(f))
 
     # 販売ファイル（購入者に渡すもの）
     shutil.copy(s("instagram_soda.pptx"), os.path.join(SALE, "01_Instagram用_ソーダ色_1080x1350.pptx"))
